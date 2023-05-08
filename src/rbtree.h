@@ -3,7 +3,9 @@
 
 #include <stddef.h>
 
-typedef enum { RBTREE_RED, RBTREE_BLACK } color_t;
+typedef enum { 
+  RBTREE_RED, RBTREE_BLACK 
+  } color_t;
 
 typedef int key_t;
 
