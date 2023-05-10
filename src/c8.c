@@ -251,14 +251,12 @@ void rb_delete_fixup(rbtree* t, node_t* x)
           w->left->color = RBTREE_BLACK;
           w->color = RBTREE_RED;
           right_rotate(t, w);
-          printf("t r");
           w = x-> parent -> right;
         }
         w->color = x->parent->color;
         x->parent->color = RBTREE_BLACK;
         w->right->color = RBTREE_BLACK;
         left_rotate(t, x->parent);
-        printf("t l");
         x = t->root;
       }
     }
@@ -365,4 +363,5 @@ int main() {
   rbtree_insert(tree,29);
   rbtree_insert(tree,16);
   rbtree_insert(tree,3);
+  rbtree_min(tree);
 }
