@@ -37,16 +37,33 @@ void rb_transplant(rbtree *t, node_t*u, node_t*v){
     u->parent->left = v;
   }
   else{
-    u->parent->left=v;
+    u->parent->right=v;
   }
   v->parent=u->parent;
 }
 
+/* 트리를 순회하면서 각 노드의 메모리 반환 함수 */
 void delete_rbtree(rbtree *t) {
-  // TODO: reclaim the tree nodes's memory
+  // 트리가 비어있지 않으면, 트리를 순회하면서 각 노드의 메모리 반환
+  if(t->root != t->nil) {
+    delete_node(t, t->root);
+  }
+  // nil 노드와 트리 구조체 메모리 반환
+  free(t->nil);
   free(t);
 }
 
+/* 각 노드와 그 자녀 노드들의 메모리 반환 함수 */
+void  delete_node(rbtree *t, node_t *node) {
+  // 트리를 후위 순회하면서 각 노드와 그 자녀 노드들의 메모리 반환 
+  if(node->left != t->nil) {
+    delete_node(t, node->left);
+  }
+  if(node->right != t->nil) {
+    delete_node(t, node->right);
+  }
+  free(node);
+}
 
 /**
  * 
@@ -190,7 +207,6 @@ node_t *rbtree_find(const rbtree *t, const key_t key) {
       return k;
     }
   }
-    printf("NULL");
     return NULL;
 }
 
@@ -294,7 +310,9 @@ int rbtree_erase(rbtree *t, node_t *p) {
     rb_transplant(t,p,p->left);
   }
   else{
-    y=rb_min(t,p->right);
+    while(y->left != t->nil) { 
+      y = y->left;
+    }
     y_orgin=y->color;
     x=y->right;
     if (y->parent == p){
@@ -312,35 +330,44 @@ int rbtree_erase(rbtree *t, node_t *p) {
   }
   if (y_orgin==RBTREE_BLACK){
     del_fix(t,x);
-  free(p);
+
   }
+  free(p);
   return 0;
 }
+void rbtree_inorder(const rbtree *t, node_t *current, key_t *arr, int *arr_idx) {
+  if(current->left != t->nil) {
+    rbtree_inorder(t, current->left, arr, arr_idx);
+  }
 
+  arr[*arr_idx] = current->key;
+  *arr_idx += 1;
+
+  if(current->right != t->nil) {
+    rbtree_inorder(t, current->right, arr, arr_idx);
+  }
+}
 int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n) {
-  // node_t* x=t->root;
-  // while ( x->left != t->nil){
-  //   x = x -> left;
-  // }
-  // node_t*(n);
-  // x->key;
-
+  int arr_idx = 0;
+  rbtree_inorder(t, t->root, arr, &arr_idx);
   return 0;
 }
 
-// int main() {
-//   rbtree*tree;
-//   tree=new_rbtree();
-//   rbtree_insert(tree,10);
-//   rbtree_insert(tree,15);
-//   rbtree_insert(tree,5);
-//   rbtree_insert(tree,2);
-//   rbtree_insert(tree,29);
-//   rbtree_insert(tree,16);
-//   rbtree_insert(tree,3);
-//   rbtree_min(tree);
-//   rbtree_max(tree);
-//   rbtree_find(tree, 15);
-//   rbtree_erase(tree,rbtree_find(tree, 15));
-//   // rbtree_to_array(tree ,8);
-// }
+
+int main() {
+  rbtree*tree;
+  tree=new_rbtree();
+  rbtree_insert(tree,10);
+  rbtree_insert(tree,15);
+  rbtree_insert(tree,5);
+  rbtree_insert(tree,2);
+  rbtree_insert(tree,29);
+  rbtree_insert(tree,16);
+  rbtree_insert(tree,3);
+  rbtree_min(tree);
+  rbtree_max(tree);
+  rbtree_find(tree, 15);
+  rbtree_erase(tree,rbtree_find(tree, 15));
+  rbtree_find(tree, 15);
+  // rbtree_to_array(tree ,8);
+}
